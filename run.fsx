@@ -9,25 +9,41 @@ type Named = {
     name: string
 }
 
+type QueryParam =
+    string
+
+let queryParam (req: HttpRequestMessage) (key: QueryParam) =
+    req.GetQueryNameValuePairs()
+    |> Seq.tryFind (fun q -> q.Key = key)
+
+let createResponse statusCode (req: HttpRequestMessage) message =
+    req.CreateResponse(statusCode, message)
+
 let Run(req: HttpRequestMessage, log: TraceWriter) =
     async {
         log.Info(sprintf 
             "F# HTTP trigger function processed a request.")
 
+        let queryParam = queryParam req;
+        let response = createResponse HttpStatusCode.OK req;
+        let badResponse = createResponse HttpStatusCode.BadRequest req;
+
+        let greet name =
+            response ("Hello " + name)
+
         // Set name to query string
-        let name =
-            req.GetQueryNameValuePairs()
-            |> Seq.tryFind (fun q -> q.Key = "name")
+        let name = queryParam "name";
 
         match name with
         | Some x ->
-            return req.CreateResponse(HttpStatusCode.OK, "Hello " + x.Value);
+            return greet x.Value;
         | None ->
             let! data = req.Content.ReadAsStringAsync() |> Async.AwaitTask
 
             if not (String.IsNullOrEmpty(data)) then
                 let named = JsonConvert.DeserializeObject<Named>(data)
-                return req.CreateResponse(HttpStatusCode.OK, "Hello " + named.name);
+
+                return greet named.name;
             else
-                return req.CreateResponse(HttpStatusCode.BadRequest, "Specify a Name value");
+                return badResponse "Specify a Name value";
     } |> Async.RunSynchronously
