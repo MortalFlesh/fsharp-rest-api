@@ -1,26 +1,14 @@
 {
-  "bindings": [
-    {
-      "name": "$return",
-      "type": "http",
-      "direction": "out"
-    },
-    {
+    "disabled": false,
+    "bindings": [{
       "type": "httpTrigger",
       "name": "req",
-      "authLevel": "function",
-      "methods": [
-        "get",
-        "post",
-        "delete",
-        "head",
-        "patch",
-        "put",
-        "options",
-        "trace"
-      ],
+      "methods": ["get","put","post","delete"],
+      "authLevel": "anonymous",
       "direction": "in"
-    }
-  ],
-  "disabled": false
+    },{
+      "type": "http",
+      "name": "res",
+      "direction": "out"
+    }]
 }

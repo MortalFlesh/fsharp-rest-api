@@ -1,6 +1,6 @@
-//#load "SuaveAdapter.fsx"
+#load "SuaveAdapter.fsx"
 #load "app.fsx"
-//open SuaveAdapter
+open SuaveAdapter
 open App
 open System.Net.Http
 open Suave
